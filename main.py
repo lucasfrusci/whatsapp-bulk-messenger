@@ -1,6 +1,6 @@
 import customtkinter as ctk
 import automate as auto
-from importlib import reload
+import threading
 
 janela = ctk.CTk()
 janela.geometry("800x600")
@@ -8,17 +8,18 @@ janela.title("WhatsApp Mensagem")
 janela.resizable(False,False)
 
 def send(message, color):
-    tbLog.configure(state="normal", text_color=color)  # Habilita a edição
+    tbLog.configure(state="normal")  # Habilita a edição
     tbLog.insert("end", message + "\n")
     tbLog.see("end")
-    tbLog.configure(state="disabled", text_color="white")
+    tbLog.configure(state="disabled")
+    
 
 labelTop = ctk.CTkLabel(janela, text="WhatsApp MENSAGEM AUTO", font=("Segoe UI", 20), height=10, width=10, text_color="green").place(x=10, y=10)
 
-btLogar = ctk.CTkButton(janela, text="LOGAR", fg_color="transparent", hover_color="green", border_width=1, border_color="white", command=auto.logar)
+btLogar = ctk.CTkButton(janela, text="LOGAR", fg_color="transparent", hover_color="green", border_width=1, border_color="white", command=auto.Tlogar)
 btLogar.place(x=10, y=50)
 
-btEnviar = ctk.CTkButton(janela, text="ENVIAR", fg_color="transparent", hover_color="green", border_width=1, border_color="white", command=auto.enviar)
+btEnviar = ctk.CTkButton(janela, text="ENVIAR", fg_color="transparent", hover_color="green", border_width=1, border_color="white", command=auto.Tenviar)
 #btEnviar.configure(command=lambda: send("**********************************************************\n"
 #                 "**********************************************************\n"
 #                 "*****                                               ******\n"

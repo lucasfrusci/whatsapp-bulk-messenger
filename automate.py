@@ -8,7 +8,22 @@ from time import sleep
 from urllib.parse import quote
 import os
 
-from importlib import reload
+import main as ma
+
+import threading
+
+def Tcarregar():
+    t1=threading.Thread(target=carregar)
+    t1.start()
+
+def Tlogar():
+    t2=threading.Thread(target=logar)
+    t2.start()
+
+def Tenviar():
+    t3=threading.Thread(target=enviar)
+    t3.start()
+
 
 class style():
         BLACK = '\033[30m'
@@ -27,7 +42,7 @@ numerosfile = "numbers.txt"
 numbers = [] 
 
 def carregar():
-    import main as ma
+    
     if os.path.exists(messagefile):
         f = open("message.txt", "r", encoding="utf8")
         message = f.read()
@@ -48,7 +63,7 @@ delay = 30
 driver = None
 
 def logar():
-    import main as ma
+
     global driver
     options = webdriver.ChromeOptions()
     #options.add_experimental_option("excludeSwitches", ["enable-logging"])
@@ -67,7 +82,7 @@ def logar():
     ma.send("Logado, clica em ENVIAR para começar", "purple")
 
 def enviar():
-    import main as ma
+
     global driver
     if driver is None:
         print("Error: You must log in first!")
@@ -75,7 +90,7 @@ def enviar():
     
     numbers.append(ma.tbNumeros.get("0.0", "end"))
     total_number=len(numbers)
-    print(style.RED + 'We found ' + str(total_number) + ' numbers in the file' + style.RESET)
+    ma.send('We found ' + str(total_number) + ' numbers in the file', "red")
 
     message = ma.tbMensagem.get("0.0", "end")
     ma.send("Essa é a sua Mensagem:", "green")
@@ -86,7 +101,7 @@ def enviar():
         number = number.strip()
         if number == "":
             continue
-        print(style.YELLOW + '{}/{} => Sending message to {}.'.format((idx+1), total_number, number) + style.RESET)
+        ma.send('{}/{} => Sending message to {}.'.format((idx+1), total_number, number), "yellow")
         try:
             url = 'https://web.whatsapp.com/send?phone=' + number + '&text=' + message
             sent = False
@@ -109,5 +124,3 @@ def enviar():
                         ma.send('Message sent to: ' + number + style.RESET, "green")
         except Exception as e:
             ma.send('Failed to send message to ' + number + str(e) + style.RESET, "red")
-
-carregar()
