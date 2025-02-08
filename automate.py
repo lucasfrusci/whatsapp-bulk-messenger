@@ -44,20 +44,17 @@ numbers = []
 def carregar():
     
     if os.path.exists(messagefile):
-        f = open("message.txt", "r", encoding="utf8")
+        f = open(messagefile, "r", encoding="utf8")
         message = f.read()
         f.close()
         ma.tbMensagem.delete("0.0", "end")
         ma.tbMensagem.insert("0.0", message)
         
     if os.path.exists(numerosfile):
-        f = open("numbers.txt", "r")
-        for line in f.read().splitlines():
-            if line.strip() != "":
-                numbers.append(line.strip())
-        f.close()
+        with open(numerosfile, "r") as f:
+            loaded_numbers = [line.strip() for line in f.readlines() if line.strip()]
         ma.tbNumeros.delete("0.0", "end")
-        ma.tbNumeros.insert("0.0", numbers)
+        ma.tbNumeros.insert("0.0", "\n".join(loaded_numbers))
 
 delay = 30
 driver = None
@@ -79,22 +76,38 @@ def logar():
     print('Once your browser opens up sign in to web whatsapp')
     driver.get('https://web.whatsapp.com')
     #input(style.MAGENTA + "AFTER logging into Whatsapp Web is complete and your chats are visible, press ENVIAR..." + style.RESET)
-    ma.send("Logado, clica em ENVIAR para começar", "purple")
+    #ma.send("Logado, clica em ENVIAR para começar", "darkgreen")
+    try:
+        WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, "//div[@role='grid']"))  # Elemento principal do WhatsApp Web
+        )
+        ma.send("\nLogado com sucesso! Agora você pode clicar em ENVIAR.", "lightgreen")
+    except Exception:
+        ma.send("Erro ao detectar login. Certifique-se de estar logado no WhatsApp Web.", "red")
 
 def enviar():
-
     global driver
     if driver is None:
-        print("Error: You must log in first!")
+        ma.send("Erro: Você prescisa estar LOGADO", "red")
         return
     
-    numbers.append(ma.tbNumeros.get("0.0", "end"))
+    if ma.tbNumeros.get("0.0", "end-1c") == "":
+        ma.send("Erro: Adicione os Numeros", "red")
+        return
+    
+    if ma.tbMensagem.get("0.0", "end-1c") == "":
+        ma.send("Erro: Adicione a Mensagem", "red")
+        return
+    
+    numbers.clear()
+    numbers.extend(ma.tbNumeros.get("0.0", "end").strip().split("\n"))
+
     total_number=len(numbers)
-    ma.send('We found ' + str(total_number) + ' numbers in the file', "red")
+    ma.send('\nTotal de ' + str(total_number) + ' numeros', "red")
 
     message = ma.tbMensagem.get("0.0", "end")
-    ma.send("Essa é a sua Mensagem:", "green")
-    ma.send(message, "green")
+    ma.send("\nEssa é a sua Mensagem:", "yellow")
+    ma.send(message, "white")
     message = quote(message)
 
     for idx, number in enumerate(numbers):
@@ -121,6 +134,8 @@ def enviar():
                         click_btn.click()
                         sent=True
                         sleep(3)
-                        ma.send('Message sent to: ' + number + style.RESET, "green")
+                        ma.send('Message sent to: ' + number, "green")
         except Exception as e:
-            ma.send('Failed to send message to ' + number + str(e) + style.RESET, "red")
+            ma.send('Failed to send message to ' + number + str(e) , "red")
+
+    ma.send("Concluído", "lightgreen")

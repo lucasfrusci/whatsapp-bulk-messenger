@@ -2,24 +2,47 @@ import customtkinter as ctk
 import automate as auto
 import threading
 
-janela = ctk.CTk()
-janela.geometry("800x600")
-janela.title("WhatsApp Mensagem")
-janela.resizable(False,False)
+root = ctk.CTk()
+root.geometry("800x600")
+root.title("WhatsApp MALA DIRETA")
+root.resizable(False,False)
+root.iconbitmap("icon.ico")
 
 def send(message, color):
     tbLog.configure(state="normal")  # Habilita a edição
-    tbLog.insert("end", message + "\n")
+    
+    tag_name =  "color-" + str(id(message))
+    tbLog.tag_config(tag_name, foreground=color)
+    tbLog.insert("end", message + "\n", tag_name)
+    #tbLog.tag_add("colored", "end-1c linestart", "end-1c lineend")
+
     tbLog.see("end")
     tbLog.configure(state="disabled")
     
 
-labelTop = ctk.CTkLabel(janela, text="WhatsApp MENSAGEM AUTO", font=("Segoe UI", 20), height=10, width=10, text_color="green").place(x=10, y=10)
+labelTop = ctk.CTkLabel(root, 
+                        text="WhatsApp MALA DIRETA", 
+                        font=("Segoe UI", 20), 
+                        height=10, width=10, 
+                        text_color="lightgreen")
+labelTop.place(x=10, y=10)
 
-btLogar = ctk.CTkButton(janela, text="LOGAR", fg_color="transparent", hover_color="green", border_width=1, border_color="white", command=auto.Tlogar)
+btLogar = ctk.CTkButton(root, 
+                        text="LOGAR", 
+                        fg_color="transparent", 
+                        hover_color="green", 
+                        border_width=1, 
+                        border_color="white", 
+                        command=auto.Tlogar)
 btLogar.place(x=10, y=50)
 
-btEnviar = ctk.CTkButton(janela, text="ENVIAR", fg_color="transparent", hover_color="green", border_width=1, border_color="white", command=auto.Tenviar)
+btEnviar = ctk.CTkButton(root, 
+                         text="ENVIAR", 
+                         fg_color="transparent", 
+                         hover_color="green", 
+                         border_width=1, 
+                         border_color="white", 
+                         command=auto.Tenviar)
 #btEnviar.configure(command=lambda: send("**********************************************************\n"
 #                 "**********************************************************\n"
 #                 "*****                                               ******\n"
@@ -34,24 +57,24 @@ btEnviar.place(x=10, y=320)
 
 
 #TEXTBOX NUMEROS
-tbNumeros = ctk.CTkTextbox(janela, width=180, height=200)
+tbNumeros = ctk.CTkTextbox(root, width=180, height=200)
 tbNumeros.insert("0.0", "Adicione os contatos")
 tbNumeros.place(x=10, y=100)
 
 #TEXTBOX MENSAGEM
-tbMensagem = ctk.CTkTextbox(janela, width=590, height=200)
+tbMensagem = ctk.CTkTextbox(root, width=590, height=200)
 tbMensagem.insert("0.0", "Digite a mensagem")
 tbMensagem.place(x=200, y=100)
 
 #TEXTBOX LOG
-tbLog = ctk.CTkTextbox(janela, width=780, height=100, font=("Arial", 20))
+tbLog = ctk.CTkTextbox(root, width=780, height=210, font=("Arial", 20))
 tbLog.insert("0.0", "Clica em logar e entra na sua conta WhatsApp web...\n")
 tbLog.place(x=10, y=380)
 tbLog.configure(state="disabled", wrap="word")
 
 auto.carregar()
 
-janela.mainloop()
+root.mainloop()
 
 
 def send():
