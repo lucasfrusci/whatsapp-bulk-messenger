@@ -8,7 +8,7 @@ from time import sleep
 from urllib.parse import quote
 import os
 
-import ui_gui as ma
+#import ui_gui as ma
 
 import threading
 
@@ -16,12 +16,12 @@ def Tcarregar():
     t1=threading.Thread(target=carregar)
     t1.start()
 
-def Tlogar():
-    t2=threading.Thread(target=logar)
+def Tlogar(send, btLogar):
+    t2=threading.Thread(target=lambda:logar(send))
     t2.start()
 
-def Tenviar():
-    t3=threading.Thread(target=enviar)
+def Tenviar(send,btPause,playicon, tbNumeros,tbMensagem,pauseicon):
+    t3=threading.Thread(target=lambda:enviar(send,btPause,playicon, tbNumeros,tbMensagem,pauseicon))
     t3.start()
 
 def userProfile():
@@ -54,38 +54,38 @@ numerosfile = "numbers.txt"
 numbers = [] 
 current_number = 0
 
-def saveFiles(filetosave):
+def saveFiles(filetosave, send, tbMensagem, tbNumeros):
     if filetosave == "numeros":
         f = open(numerosfile, "w", encoding="utf-8")
-        f.write(ma.tbNumeros.get("0.0", "end-1c"))
+        f.write(tbNumeros.get("0.0", "end-1c"))
         f.close
-        ma.send("Contatos Salvos...", "lightgreen")
+        send("Contatos Salvos...", "lightgreen")
     else:
         f = open(messagefile, "w", encoding="utf-8")
-        f.write(ma.tbMensagem.get("0.0", "end-1c"))
+        f.write(tbMensagem.get("0.0", "end-1c"))
         f.close
-        ma.send("Mensagem Salva...", "lightgreen")
+        send("Mensagem Salva...", "lightgreen")
 
-def carregar():    
+def carregar(tbMensagem, tbNumeros):    
     if os.path.exists(messagefile):
         f = open(messagefile, "r", encoding="utf8")
         message = f.read()
         f.close()
-        ma.tbMensagem.delete("0.0", "end")
-        ma.tbMensagem.insert("0.0", message)
+        tbMensagem.delete("0.0", "end")
+        tbMensagem.insert("0.0", message)
         
     if os.path.exists(numerosfile):
         with open(numerosfile, "r") as f:
             loaded_numbers = [line.strip() for line in f.readlines() if line.strip()]
-        ma.tbNumeros.delete("0.0", "end")
-        ma.tbNumeros.insert("0.0", "\n".join(loaded_numbers))
+        tbNumeros.delete("0.0", "end")
+        tbNumeros.insert("0.0", "\n".join(loaded_numbers))
 
 delay = 30
 driver = None
 status = False
 
-def logar():
-    ma.send("\nEscaneie o QR CODE e faça o LOGIN ou aguarde o CHAT aparecer", "yellow")
+def logar(send):
+    send("\nEscaneie o QR CODE e faça o LOGIN ou aguarde o CHAT aparecer", "yellow")
     global driver
     options = webdriver.ChromeOptions()
     #options.add_experimental_option("excludeSwitches", ["enable-logging"])
@@ -105,44 +105,44 @@ def logar():
         WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.XPATH, "//div[@role='grid']"))  # Elemento principal do WhatsApp Web
         )
-        ma.send("\nLogado com sucesso! Agora você pode clicar em ENVIAR.", "lightgreen")
+        send("\nLogado com sucesso! Agora você pode clicar em ENVIAR.", "lightgreen")
     except Exception:
         sleep(0.01)
         #ma.send("\nErro ao detectar login. Certifique-se de estar logado no WhatsApp Web.", "red")
 
-def pause(command):
+def pause(command,send,btPause,playicon, tbNumeros,tbMensagem,pauseicon):
     global status
     if command == "pausar": 
         status = True
-        ma.send("Pausando...", "yellow")
-        ma.btPause.configure(image=ma.playicon, 
+        send("Pausando...", "yellow")
+        btPause.configure(image=playicon, 
                              text="RETOMAR",
                              command=lambda: pause("continuar"))
     else:
         status = False
         #ma.send("Continuando!", "yellow")
-        Tenviar()
+        Tenviar(send,btPause,playicon, tbNumeros,tbMensagem,pauseicon)
         #ma.btPause.configure(image=ma.pauseicon, 
         #                    command=lambda: pause("pausar"))
     
-def parar():
+def parar(send,btPause,playicon):
     global current_number
     global status
     global driver
     if driver == None:
-        ma.send("Macro não esta em operação", "red")
+        send("Macro não esta em operação", "red")
         status = False
     else:
         status = True
         driver.close()
         driver = None
         current_number = 0
-        ma.send("Cancelado!", "red")
-        ma.btPause.configure(image=ma.playicon, 
+        send("Cancelado!", "red")
+        btPause.configure(image=playicon, 
                              text="ENVIAR",
                             command=lambda: pause("continuar"))
 
-def enviar():
+def enviar(send,btPause,playicon, tbNumeros,tbMensagem,pauseicon):
     global current_number
     global driver
     
@@ -153,30 +153,30 @@ def enviar():
     driver = webdriver.Chrome(service=webdriver.chrome.service.Service(ChromeDriverManager().install()), options=options)
 
     if driver is None:
-        ma.send("Erro: Você prescisa estar LOGADO", "red")
+        send("Erro: Você prescisa estar LOGADO", "red")
         return
     
-    if ma.tbNumeros.get("0.0", "end-1c") == "":
-        ma.send("Erro: Adicione os Numeros", "red")
+    if tbNumeros.get("0.0", "end-1c") == "":
+        send("Erro: Adicione os Numeros", "red")
         return
     
-    if ma.tbMensagem.get("0.0", "end-1c") == "":
-        ma.send("Erro: Adicione a Mensagem", "red")
+    if tbMensagem.get("0.0", "end-1c") == "":
+        send("Erro: Adicione a Mensagem", "red")
         return
     
-    ma.btPause.configure(image=ma.pauseicon, 
+    btPause.configure(image=pauseicon, 
                          text="PAUSAR",
                          command=lambda: pause("pausar"))
     
     numbers.clear()
-    numbers.extend(ma.tbNumeros.get("0.0", "end").strip().split("\n"))
+    numbers.extend(tbNumeros.get("0.0", "end").strip().split("\n"))
 
     total_number=len(numbers)
-    ma.send('\nTotal de ' + str(total_number) + ' numeros', "red")
+    send('\nTotal de ' + str(total_number) + ' numeros', "red")
 
-    message = ma.tbMensagem.get("0.0", "end")
-    ma.send("\nEssa é a sua Mensagem:", "lightgreen")
-    ma.send(message, "white")
+    message = tbMensagem.get("0.0", "end")
+    send("\nEssa é a sua Mensagem:", "lightgreen")
+    send(message, "white")
     message = quote(message)
 
     while current_number < total_number:
@@ -188,7 +188,7 @@ def enviar():
         number = number.strip()
         if number == "":
             continue
-        ma.send('{}/{} => Sending message to {}.'.format((current_number+1), total_number, number), "yellow")
+        send('{}/{} => Sending message to {}.'.format((current_number+1), total_number, number), "yellow")
         try:
             url = 'https://web.whatsapp.com/send?phone=' + number + '&text=' + message
             sent = False
@@ -201,9 +201,9 @@ def enviar():
                         click_btn = WebDriverWait(driver, delay).until(EC.element_to_be_clickable((By.XPATH, "//button[@data-tab='11']")))
                     except Exception as e:
                         retry = (i+1)
-                        ma.send("Failed to send message to: " + number + ", retry ("+ str(retry) + "/1)", "red")
-                        ma.send("Make sure your phone and computer is connected to the internet.", "red")
-                        ma.send("If there is an alert, please dismiss it.", "red")
+                        send("Failed to send message to: " + number + ", retry ("+ str(retry) + "/1)", "red")
+                        send("Make sure your phone and computer is connected to the internet.", "red")
+                        send("If there is an alert, please dismiss it.", "red")
                         if retry > 1:
                             current_number = (current_number+1)
                     else:
@@ -212,13 +212,13 @@ def enviar():
                         sent=True
                         sleep(3)
                         current_number = (current_number+1)
-                        ma.send('Message sent to: ' + number, "green")
+                        send('Message sent to: ' + number, "green")
         except Exception as e:
-            ma.send('Failed to send message to ' + number + str(e) , "red")
+            send('Failed to send message to ' + number + str(e) , "red")
     #CONCLUIDO RESETA A CONTAGEM E RESTAURA O BOTAO
     current_number = 0
     driver.close()
-    ma.send("Concluído", "lightgreen")
-    ma.btPause.configure(image=ma.playicon, 
+    send("Concluído", "lightgreen")
+    btPause.configure(image=playicon, 
                              text="ENVIAR",
                             command=lambda: pause("continuar"))

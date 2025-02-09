@@ -57,7 +57,7 @@ btLogar = ctk.CTkButton(root,
                         #hover_color="green", 
                         border_width=1, 
                         border_color="white", 
-                        command=auto.Tlogar)
+                        command=lambda:auto.Tlogar(send, btLogar))
 btLogar.place(x=10, y=50)
 
 btEnviar = ctk.CTkButton(root, 
@@ -66,7 +66,7 @@ btEnviar = ctk.CTkButton(root,
                          #hover_color="green", 
                          border_width=1, 
                          border_color="white", 
-                         command=auto.Tenviar)
+                         command=lambda:auto.Tenviar(send))
 #btEnviar.place(x=10, y=315)
 
 
@@ -82,7 +82,7 @@ BtNumeros = ctk.CTkButton(root,
                     text="",
                     fg_color="transparent",
                     image=saveicon,
-                    command=lambda: auto.saveFiles("numeros"))
+                    command=lambda: auto.saveFiles("numeros", send,tbMensagem,tbNumeros))
 BtNumeros.place(x=140, y=250)
 
 
@@ -99,7 +99,7 @@ BtMensagem = ctk.CTkButton(root,
                     text="",
                     fg_color="transparent",
                     image=saveicon,
-                    command=lambda: auto.saveFiles("mensagem"))
+                    command=lambda: auto.saveFiles("mensagem",send, tbMensagem, tbNumeros))
 BtMensagem.place(x=740, y=250)
 
 #BOTOES PLAY, PAUSE E PARAR
@@ -109,7 +109,7 @@ btPause = ctk.CTkButton(root, width=40,
                         text="ENVIAR", 
                         fg_color="transparent", 
                         image=playicon, 
-                        command=lambda: auto.pause("continuar"))
+                        command=lambda: auto.pause("continuar", send,btPause, playicon, tbNumeros,tbMensagem,pauseicon))
 btPause.place(x=10, y=310)
 
 btParar = ctk.CTkButton(root, 
@@ -118,7 +118,7 @@ btParar = ctk.CTkButton(root,
                     text="",
                     fg_color="transparent",
                     image=stopicon,
-                    command=auto.parar)
+                    command=lambda:auto.parar(send,btPause, playicon))
 btParar.place(x=200, y=310)
 
 
@@ -128,7 +128,7 @@ tbLog.insert("0.0", "Clica em LOGAR e entra na sua conta WhatsApp web...\n")
 tbLog.place(x=10, y=360)
 tbLog.configure(state="disabled", wrap="word")
 
-auto.carregar()
+auto.carregar(tbMensagem, tbNumeros)
 
 root.mainloop()
 
