@@ -85,7 +85,7 @@ driver = None
 status = False
 
 def logar():
-
+    ma.send("\nEscaneie o QR CODE e faça o LOGIN ou aguarde o CHAT aparecer", "yellow")
     global driver
     options = webdriver.ChromeOptions()
     #options.add_experimental_option("excludeSwitches", ["enable-logging"])
@@ -95,9 +95,8 @@ def logar():
     os.system("")
     os.environ["WDM_LOG_LEVEL"] = "0"
     
-
-
     driver = webdriver.Chrome(service=webdriver.chrome.service.Service(ChromeDriverManager().install()), options=options)
+    #driver = webdriver.Chrome(options=options)
     print('Once your browser opens up sign in to web whatsapp')
     driver.get('https://web.whatsapp.com')
     #input(style.MAGENTA + "AFTER logging into Whatsapp Web is complete and your chats are visible, press ENVIAR..." + style.RESET)
@@ -108,7 +107,8 @@ def logar():
         )
         ma.send("\nLogado com sucesso! Agora você pode clicar em ENVIAR.", "lightgreen")
     except Exception:
-        ma.send("\nErro ao detectar login. Certifique-se de estar logado no WhatsApp Web.", "red")
+        sleep(0.01)
+        #ma.send("\nErro ao detectar login. Certifique-se de estar logado no WhatsApp Web.", "red")
 
 def pause(command):
     global status
@@ -145,6 +145,13 @@ def parar():
 def enviar():
     global current_number
     global driver
+    
+    options = webdriver.ChromeOptions()
+    options.add_argument("--profile-directory=Default")
+    options.add_argument("--user-data-dir=/var/tmp/chrome_user_data")
+    options.add_argument("--headless=new")
+    driver = webdriver.Chrome(service=webdriver.chrome.service.Service(ChromeDriverManager().install()), options=options)
+
     if driver is None:
         ma.send("Erro: Você prescisa estar LOGADO", "red")
         return
@@ -210,6 +217,7 @@ def enviar():
             ma.send('Failed to send message to ' + number + str(e) , "red")
     #CONCLUIDO RESETA A CONTAGEM E RESTAURA O BOTAO
     current_number = 0
+    driver.close()
     ma.send("Concluído", "lightgreen")
     ma.btPause.configure(image=ma.playicon, 
                              text="ENVIAR",
