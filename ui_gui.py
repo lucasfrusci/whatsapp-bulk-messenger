@@ -23,13 +23,13 @@ root.iconbitmap(appicon)
 saveicon = get_resource_path("save.png")
 saveicon = PhotoImage(file=saveicon)
 
-#playicon = get_resource_path("play.png")
-#playicon = PhotoImage(file=playicon)
+playicon = get_resource_path("play.png")
+playicon = PhotoImage(file=playicon)
 
-#pauseicon = get_resource_path("pause.png")
-#pauseicon = PhotoImage(file=pauseicon)
+pauseicon = get_resource_path("pause.png")
+pauseicon = PhotoImage(file=pauseicon)
 
-stopicon = get_resource_path("stop.png")
+stopicon = get_resource_path("cancel.png")
 stopicon = PhotoImage(file=stopicon)
 
 def send(message, color):
@@ -67,7 +67,7 @@ btEnviar = ctk.CTkButton(root,
                          border_width=1, 
                          border_color="white", 
                          command=auto.Tenviar)
-btEnviar.place(x=10, y=315)
+#btEnviar.place(x=10, y=315)
 
 
 #TEXTBOX NUMEROS
@@ -104,8 +104,13 @@ BtMensagem.place(x=740, y=250)
 
 #BOTOES PLAY, PAUSE E PARAR
 
-#btPause = ctk.CTkButton(root, width=40, height=40,text="", fg_color="transparent", image=stopicon, command=lambda: auto.pause("pausar"))
-#btPause.place(x=200, y=310)
+btPause = ctk.CTkButton(root, width=40, 
+                        height=40,
+                        text="ENVIAR", 
+                        fg_color="transparent", 
+                        image=playicon, 
+                        command=lambda: auto.pause("continuar"))
+btPause.place(x=10, y=310)
 
 btParar = ctk.CTkButton(root, 
                     width=40,
